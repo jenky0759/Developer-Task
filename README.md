@@ -45,7 +45,7 @@ See https://laravel.com/docs/11.x/installation#creating-a-laravel-project for fu
 Once installed go to the project directory and run:
 ```
 composer install
-npm i
+npm i && npm run build
 ```
 
 Update the .env file with the correct database connection details before executing the following:
