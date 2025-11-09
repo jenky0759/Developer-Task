@@ -1,5 +1,8 @@
 <script setup>
-defineProps(['label', 'path']);
+defineProps({
+    label: String,
+    path: String
+});
 </script>
 
 <template>

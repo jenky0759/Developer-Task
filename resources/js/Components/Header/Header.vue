@@ -1,5 +1,7 @@
 <script setup>
-defineProps(['heading'])
+defineProps({
+    heading: String
+});
 </script>
 
 <template>
