@@ -4,7 +4,7 @@ defineProps({
     variant: {
         type: String,
         default: "h1",
-        validator(value) {
+        validator(value, props) {
             const valueToLowerCase = value.toLowerCase();
             const valid = ["h1", "h2", "h3", "h4"].includes(valueToLowerCase);
 
@@ -22,9 +22,9 @@ defineProps({
 <template>
     <div class="header">
         <h1 v-if="variant === 'h1'">{{heading}}</h1>
-        <h1 v-if="variant === 'h2'">{{heading}}</h1>
-        <h1 v-if="variant === 'h3'">{{heading}}</h1>
-        <h1 v-if="variant === 'h4'">{{heading}}</h1>
+        <h2 v-if="variant === 'h2'">{{heading}}</h2>
+        <h3 v-if="variant === 'h3'">{{heading}}</h3>
+        <h4 v-if="variant === 'h4'">{{heading}}</h4>
         <div>
             <slot />
         </div>
