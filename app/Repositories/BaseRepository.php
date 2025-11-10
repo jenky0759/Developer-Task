@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Repositories\Interfaces\IBaseRepository;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class BaseRepository implements IBaseRepository
@@ -15,14 +16,22 @@ class BaseRepository implements IBaseRepository
     }
 
     // should really be doing a paged list
-    public function all()
+    public function all(array $includes = null): Collection
     {
-        return $this->model->all();
+        $query = $this->model->query();
+
+        $this->addIncludesToQuery($query, $includes);
+
+        return $query->get();
     }
 
-    public function getById(int $id) : Model
+    public function getById(int $id, array $includes = null) : Model
     {
-        return $this->model->findOrFail($id);
+        $query = $this->model->query();
+
+        $this->addIncludesToQuery($query, $includes);
+
+        return $query->findOrFail($id);
     }
 
     public function create(array $attributes) : Model
@@ -41,6 +50,15 @@ class BaseRepository implements IBaseRepository
 
     public function delete(int $id) : bool
     {
-        return $this->model->where('id', $id)->delete();
+        return $this->model->query()->where('id', $id)->delete();
+    }
+
+    protected function addIncludesToQuery($query, array $includes = null): void
+    {
+        if($includes !== null && count($includes) > 0){
+            foreach($includes as $include){
+                $query->with($include);
+            }
+        }
     }
 }

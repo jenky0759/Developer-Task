@@ -19,7 +19,7 @@ class CustomerController extends Controller
      */
     public function getList()
     {
-        $response = $this->customerRepository->all();
+        $response = $this->customerRepository->all(['category', 'contacts']);
 
         return response()->json(CustomerResource::collection($response));
     }
@@ -41,7 +41,7 @@ class CustomerController extends Controller
      */
     public function show(string $id)
     {
-        return response()->json($this->customerRepository->getById($id));
+         return response()->json(new CustomerResource($this->customerRepository->getById($id, ['category', 'contacts'])));
     }
 
     /**
