@@ -11,7 +11,7 @@ class CustomerRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'reference' => ['required', Rule::unique('customers', 'reference')],
+            'reference' => ['required', Rule::unique('customers', 'reference')->ignore($this->id)],
             'category_id' => ['required', Rule::exists('categories', 'id')],
             'start_date' => 'nullable|date',
             'description' => 'nullable'

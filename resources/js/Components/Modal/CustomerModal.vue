@@ -7,8 +7,11 @@ import useCustomerService from "@/Composables/useCustomerService.js";
 import Customer from "@/Models/Customer.js";
 import {useVfm} from "vue-final-modal";
 
-const customerId = defineProps(['customerId']);
-defineEmits('onBackClick', 'onSaveClick');
+const props = defineProps({
+    customerId: Number
+});
+const emit = defineEmits(['onBackClick', 'onSaveClick']);
+const customerModalId = 'customer-modal';
 
 const {
     getCustomerById,
@@ -20,50 +23,59 @@ const {
 const vfm = useVfm();
 
 const customer = ref(new Customer());
-const errors = ref([]);
-
+const validationErrors = ref([]);
 
 const onBackClick = () => {
-    vfm.close('customer-modal');
+    vfm.close(customerModalId);
     customer.value = new Customer();
-    this.$emit('onBackClick');
+    validationErrors.value = [];
+    emit('onBackClick');
 };
 
 const onSaveClick = async () => {
-    errors.value = [];
+    validationErrors.value = [];
     if(!customer.value.name) {
-        errors.value.push("Name is required");
+        validationErrors.value.push("Name is required");
     }
 
     if(!customer.value.reference) {
-        errors.value.push("Reference is required");
+        validationErrors.value.push("Reference is required");
     }
 
     if(!customer.value.category_id) {
-        errors.value.push("Category is required");
+        validationErrors.value.push("Category is required");
     }
 
-    if(errors.value.length){
+    if(validationErrors.value.length){
         return;
     }
 
-    if(customerId) {
-        await updateCustomer(customer.value);
-        alert(`Updated customer`);
-    } else {
-        await createCustomer(customer.value);
+    let result;
+    let message;
 
-        alert(`Created customer`);
+    if(props.customerId) {
+        result = await updateCustomer(customer.value);
+        message = "Updated customer";
+    } else {
+        result = await createCustomer(customer.value);
+        message = 'Created customer';
     }
 
-    await vfm.close('customer-modal');
-    this.$emit('onSaveClick');
+    if(!result) {
+        alert('An error occurred, please try again');
+        return;
+    }
+
+    customer.value = new Customer();
+    alert(message);
+    await vfm.close(customerModalId);
+    emit('onSaveClick');
 };
 
-watch(customerId, async (_oldId, newId) => {
-//todo this shouldn't fire unless modal is open
-    if(!newId) {
-        customer.value = null;
+watch(props, async (_oldId, newId) => {
+
+    if(!newId?.customerId || vfm.openedModals.filter(p => p.props.modalId === customerModalId).length === 0) {
+        customer.value = new Customer();
         return;
     }
 
@@ -104,6 +116,11 @@ watch(customerId, async (_oldId, newId) => {
                             variant="h2"
                         />
                         <div class="form-inputs-container">
+                            <div v-if="validationErrors.length">
+                                <div v-for="validationError in validationErrors">
+                                    - {{validationError}}
+                                </div>
+                            </div>
                             <div class="form-control-group">
                                 <label for="name">Name*</label>
                                 <input class="form-input" type="text" required autofocus v-model="customer.name"/>

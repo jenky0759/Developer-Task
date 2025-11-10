@@ -44,7 +44,6 @@ const columns = [
 const deleteModalId = 'delete-confirmation';
 const customerModalId = 'customer-modal';
 const selectedCustomer = ref();
-const currentOpenModalId = ref(null);
 const customers = ref();
 
 const {
@@ -62,13 +61,11 @@ const openCustomerModal = async () => {
 
 const onEdit = async (customer) => {
     selectedCustomer.value = customer;
-    currentOpenModalId.value = customerModalId;
     await openCustomerModal();
 };
 
 const onDelete = async (customer) => {
     selectedCustomer.value = customer;
-    currentOpenModalId.value = deleteModalId;
     await vfm.open(deleteModalId)
 }
 
@@ -92,7 +89,6 @@ const internalGetCustomers = async () => {
 };
 
 const onConfirmDelete = async () => {
-    await vfm.close(currentOpenModalId.value);
     const response = await deleteCustomerById(selectedCustomer.value.id);
 
     if(response) {
@@ -105,10 +101,7 @@ const onConfirmDelete = async () => {
 };
 
 const onCancel = () => {
-    console.log('cancel')
   selectedCustomer.value = null;
-  vfm.close(currentOpenModalId.value);
-  currentOpenModalId.value = null;
 };
 
 onMounted(internalGetCustomers);
@@ -138,6 +131,8 @@ onMounted(internalGetCustomers);
         <CustomerModal
             :customerId="selectedCustomer?.id"
             heading="Customers - Details"
+            @onBackClick="onCancel"
+            @onSaveClick="internalGetCustomers"
         />
         <ConfirmationModal
             :modalId="deleteModalId"

@@ -6,10 +6,11 @@ defineProps({
         required: true
     }
 });
+
 </script>
 
 <template>
-    <VueFinalModal class="modal" content-class="modal-content" :modal-id="modalId">
+    <VueFinalModal class="modal" content-class="modal-content" :modal-id="modalId" :click-to-close="false">
         <slot name="header" />
         <slot />
     </VueFinalModal>

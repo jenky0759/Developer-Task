@@ -2,23 +2,38 @@
 
 import BaseModal from "@/Components/Modal/BaseModal.vue";
 import Button from "@/Components/Button/Button.vue";
+import {useVfm} from "vue-final-modal";
 
-defineProps({
+const props = defineProps({
     modalId: {
         type: String,
         required: true
     }
 });
 
-defineEmits(['onCancel', 'onConfirm']);
+const emit = defineEmits(['onCancel', 'onConfirm']);
+
+const vfm = useVfm();
+
+const onCancel = () => {
+    vfm.close(props.modalId);
+    emit('onCancel');
+};
+
+const onConfirm = () => {
+    vfm.close(props.modalId);
+    emit('onConfirm');
+};
+
+
 </script>
 
 <template>
-    <BaseModal class="confirmation-modal" :modalId="modalId" @click-outside="() => console.log('clicked outside')">
+    <BaseModal class="confirmation-modal" :modalId="modalId">
         <slot />
         <div class="modal-footer">
-            <Button variant="secondary" @click="$emit('onCancel')">Cancel</Button>
-            <Button variant="primary" @click="$emit('onConfirm')">Confirm</Button>
+            <Button variant="secondary" @click="onCancel">Cancel</Button>
+            <Button variant="primary" @click="onConfirm">Confirm</Button>
         </div>
     </BaseModal>
 </template>

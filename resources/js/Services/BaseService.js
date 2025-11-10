@@ -13,7 +13,7 @@ export default class BaseService {
 
             return response.data;
         } catch (error) {
-            console.error(`Error occurred for request ${request.url}`, error);
+            console.error(`Error occurred for request ${this._instance.getUri()}${request.url}`, error);
             if(error.response) {
                 throw {
                     message: error.response.message,
@@ -36,7 +36,6 @@ export default class BaseService {
     }
 
     async post(url, data, config) {
-
         return this._baseRequest({
             method: 'POST',
             url,
@@ -45,7 +44,6 @@ export default class BaseService {
     }
 
     async put(url, data, config) {
-
         return this._baseRequest({
             method: 'PUT',
             url,
@@ -54,7 +52,6 @@ export default class BaseService {
     }
 
     async delete(url, config) {
-
         return this._baseRequest({
             method: 'DELETE',
             url
