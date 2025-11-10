@@ -26,5 +26,6 @@ defineProps({
     background: white;
     min-width: 300px;
     min-height: 200px;
+    display: flex;
 }
 </style>
