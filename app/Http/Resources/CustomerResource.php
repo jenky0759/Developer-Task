@@ -23,7 +23,8 @@ class CustomerResource extends JsonResource
                 'name' => $this->category->name
             ] : null,
             'start_date' => $this->start_date,
-            'description'  => $this->description
+            'description'  => $this->description,
+            'contacts' => ContactResource::collection($this->contacts)
         ];
     }
 }

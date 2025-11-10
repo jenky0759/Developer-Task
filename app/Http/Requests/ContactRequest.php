@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class CustomerRequest extends FormRequest
+class ContactRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,14 +21,12 @@ class CustomerRequest extends FormRequest
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
-    public function rules() : array
+    public function rules(): array
     {
         return [
-            'name' => 'required',
-            'reference' => ['required', Rule::unique('customers', 'reference')->ignore($this->id)],
-            'category_id' => ['required', Rule::exists('categories', 'id')],
-            'start_date' => 'nullable|date',
-            'description' => 'nullable'
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'customer_id' => ['required', Rule::exists('customers', 'id')]
         ];
     }
 }
