@@ -22,10 +22,10 @@ class CustomerService extends BaseService {
     }
 
     async update(customer){
-        return this.put('', customer);
+        return this.put(`${customer.id}`, customer);
     }
 
-    async delete(id) {
+    async deleteById(id) {
         return this.delete(id);
     }
 

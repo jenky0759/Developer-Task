@@ -5,22 +5,69 @@ import Button from "@/Components/Button/Button.vue";
 import { ref, watch} from "vue";
 import useCustomerService from "@/Composables/useCustomerService.js";
 import Customer from "@/Models/Customer.js";
+import {useVfm} from "vue-final-modal";
 
 const customerId = defineProps(['customerId']);
+defineEmits('onBackClick', 'onSaveClick');
+
+const {
+    getCustomerById,
+    createCustomer,
+    updateCustomer,
+    isLoading
+} = useCustomerService();
+
+const vfm = useVfm();
 
 const customer = ref(new Customer());
+const errors = ref([]);
+
 
 const onBackClick = () => {
+    vfm.close('customer-modal');
+    customer.value = new Customer();
+    this.$emit('onBackClick');
 };
 
-const onSaveClick = () => {
-};
+const onSaveClick = async () => {
+    errors.value = [];
+    if(!customer.value.name) {
+        errors.value.push("Name is required");
+    }
 
-const { getCustomerById, error, isLoading } = useCustomerService();
+    if(!customer.value.reference) {
+        errors.value.push("Reference is required");
+    }
+
+    if(!customer.value.category_id) {
+        errors.value.push("Category is required");
+    }
+
+    if(errors.value.length){
+        return;
+    }
+
+    if(customerId) {
+        await updateCustomer(customer.value);
+        alert(`Updated customer`);
+    } else {
+        await createCustomer(customer.value);
+
+        alert(`Created customer`);
+    }
+
+    await vfm.close('customer-modal');
+    this.$emit('onSaveClick');
+};
 
 watch(customerId, async (_oldId, newId) => {
+//todo this shouldn't fire unless modal is open
+    if(!newId) {
+        customer.value = null;
+        return;
+    }
+
     const response = await getCustomerById(newId.customerId);
-    console.log(response);
 
     if(response) {
         customer.value = new Customer(response);
@@ -43,13 +90,13 @@ watch(customerId, async (_oldId, newId) => {
                 <Button variant="secondary" @onClick="onBackClick">
                     Back
                 </Button>
-                <Button @onClick="onBackClick">
+                <Button @onClick="onSaveClick">
                     Save
                 </Button>
             </div>
         </Header>
         <div>
-            <div>
+            <div v-if="!isLoading">
                 <form @submit.prevent="">
                     <div class="section">
                         <Header
@@ -67,8 +114,11 @@ watch(customerId, async (_oldId, newId) => {
                             </div>
                             <div class="form-control-group">
                                 <label for="category">Category*</label>
-                                <select class="form-input" required>
-                                    <option>Gold</option>
+                                <select class="form-input" required v-model="customer.category_id">
+                                    <!--Normally would make request to populate-->
+                                    <option :selected="customer.category_id === 1" :value="1">Gold</option>
+                                    <option :selected="customer.category_id === 2" :value="2">Silver</option>
+                                    <option :selected="customer.category_id === 3" :value="3">Bronze</option>
                                 </select>
                             </div>
                         </div>
@@ -91,6 +141,7 @@ watch(customerId, async (_oldId, newId) => {
                     </div>
                 </form>
             </div>
+            <div v-if="isLoading">Loading...</div>
         </div>
     </BaseModal>
 </template>

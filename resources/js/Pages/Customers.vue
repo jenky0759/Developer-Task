@@ -6,6 +6,7 @@ import {useVfm} from "vue-final-modal";
 import Button from "@/Components/Button/Button.vue";
 import {onMounted, ref} from "vue";
 import useCustomerService from "@/Composables/useCustomerService.js";
+import ConfirmationModal from "@/Components/Modal/ConfirmationModal.vue";
 
 const action = {
     header: 'Edit | Delete',
@@ -40,25 +41,38 @@ const columns = [
     }
 ];
 
-const selectedCustomerId = ref();
-
+const deleteModalId = 'delete-confirmation';
+const customerModalId = 'customer-modal';
+const selectedCustomer = ref();
+const currentOpenModalId = ref(null);
 const customers = ref();
+
+const {
+    getCustomers,
+    deleteCustomerById,
+    error,
+    isLoading
+} = useCustomerService();
 
 const vfm = useVfm();
 
-const openCustomerModal = () => {
-    vfm.open('customer-modal');
+const openCustomerModal = async () => {
+    await vfm.open(customerModalId);
 };
 
-const onEdit = (customer) => {
+const onEdit = async (customer) => {
+    selectedCustomer.value = customer;
+    currentOpenModalId.value = customerModalId;
+    await openCustomerModal();
+};
 
-    selectedCustomerId.value = customer.id;
-    openCustomerModal();
+const onDelete = async (customer) => {
+    selectedCustomer.value = customer;
+    currentOpenModalId.value = deleteModalId;
+    await vfm.open(deleteModalId)
 }
 
-const { getCustomers, error, isLoading } = useCustomerService();
-
-onMounted(async () => {
+const internalGetCustomers = async () => {
     const response = await getCustomers();
 
     if(response) {
@@ -75,37 +89,85 @@ onMounted(async () => {
     }
 
     customers.value = null;
-});
+};
+
+const onConfirmDelete = async () => {
+    await vfm.close(currentOpenModalId.value);
+    const response = await deleteCustomerById(selectedCustomer.value.id);
+
+    if(response) {
+        await internalGetCustomers();
+
+        alert(`Deleted ${selectedCustomer.value.name} ref: ${selectedCustomer.value.reference}`);
+    }
+
+    selectedCustomer.value = null;
+};
+
+const onCancel = () => {
+    console.log('cancel')
+  selectedCustomer.value = null;
+  vfm.close(currentOpenModalId.value);
+  currentOpenModalId.value = null;
+};
+
+onMounted(internalGetCustomers);
 
 </script>
 
 <template>
-        <div>
-            <Header heading="Customers">
-                <Button @onClick="openCustomerModal">
-                    Create
-                </Button>
-            </Header>
-            <div>
-                <Table
-                    v-if="!isLoading && customers && customers.length"
-                    :rows="customers"
-                    :columns="columns"
-                    :action="action"
-                    @edit="onEdit"
-                    @delete="(x) => console.log('Emitted event delete', x)"
-                />
-                <div v-if="isLoading">Loading...</div>
-                <div v-if="!customers || !customers.length || error">No Customers</div>
-            </div>
-
-            {{selectedCustomerId}}
-            <CustomerModal
-                :customerId="selectedCustomerId"
-                heading="Customers - Details"
+    <div>
+        <Header heading="Customers">
+            <Button @onClick="openCustomerModal">
+                Create
+            </Button>
+        </Header>
+        <div class="table-wrapper">
+            <Table
+                v-if="!isLoading && customers && customers.length"
+                :rows="customers"
+                :columns="columns"
+                :action="action"
+                @edit="onEdit"
+                @delete="onDelete"
             />
+            <div v-if="isLoading">Loading...</div>
+            <div v-if="!customers || !customers.length || error">No Customers</div>
         </div>
+
+        <CustomerModal
+            :customerId="selectedCustomer?.id"
+            heading="Customers - Details"
+        />
+        <ConfirmationModal
+            :modalId="deleteModalId"
+            @onCancel="onCancel"
+            @onConfirm="onConfirmDelete"
+        >
+            <div class="confirmation-modal-slot-wrapper">
+                <Header variant="h3" heading="Delete Customer"/>
+                <div class="question">
+                    <div>Are you sure you wish to delete customer {{selectedCustomer?.name}} ref: {{selectedCustomer?.reference}}?</div>
+                </div>
+            </div>
+        </ConfirmationModal>
+    </div>
 </template>
 
 <style scoped>
+.table-wrapper {
+    margin-top: 20px;
+}
+
+.confirmation-modal-slot-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.question {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
 </style>

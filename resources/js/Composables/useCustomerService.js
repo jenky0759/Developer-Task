@@ -31,10 +31,52 @@ export default function useCustomerService() {
         }
     };
 
+    const createCustomer = async (customer) => {
+        isLoading.value = true;
+        error.value = null;
+        try {
+            return await CustomerService.create(customer);
+        } catch (e) {
+            error.value = e;
+        }
+        finally {
+            isLoading.value = false;
+        }
+    };
+
+    const updateCustomer = async (customer) => {
+        isLoading.value = true;
+        error.value = null;
+        try {
+            return await CustomerService.update(customer);
+        } catch (e) {
+            error.value = e;
+        }
+        finally {
+            isLoading.value = false;
+        }
+    };
+
+    const deleteCustomerById = async (id) => {
+        isLoading.value = true;
+        error.value = null;
+        try {
+            return await CustomerService.deleteById(`${id}`);
+        } catch (e) {
+            error.value = e;
+        }
+        finally {
+            isLoading.value = false;
+        }
+    };
+
     return {
         error,
         isLoading,
         getCustomers,
-        getCustomerById
+        getCustomerById,
+        createCustomer,
+        updateCustomer,
+        deleteCustomerById
     };
 }
