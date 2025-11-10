@@ -62,7 +62,7 @@ th, td {
 }
 
 .row-odd td {
-    background: rgba(0,0,0, 0.05);
+    background: #F2F2F2;
 }
 
 .action-column {
