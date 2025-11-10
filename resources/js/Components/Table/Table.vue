@@ -1,8 +1,11 @@
 <script setup>
 defineProps({
-    headers: Array,
     rows: Array,
-    actions: Array
+    columns: Array,
+    action: {
+        header: String,
+        items: Array
+    }
 });
 </script>
 
@@ -10,23 +13,26 @@ defineProps({
 <table>
     <thead>
     <tr>
-        <th v-for="header in headers">
-            {{header}}
+        <th v-for="column in columns">
+            {{column.header}}
+        </th>
+        <th v-if="action">
+            {{action.header}}
         </th>
     </tr>
     </thead>
     <tbody>
         <tr v-for="(row, index) in rows" :class="index % 2 === 0 ? null : 'row-odd'">
-            <td v-for="cell in row">
-                {{cell}}
+            <td v-for="column in columns">
+                {{row[column.field]}}
             </td>
-            <td class="action-column" v-if="actions">
-                <div v-for="(action, index) in actions">
+            <td class="action-column" v-if="action && action.items && action.items.length">
+                <div v-for="(item, index) in action.items">
                     <div>
-                        <a href="javascript:void(0)" @click="$emit(action.name, row)">
-                            {{action.label}}
+                        <a href="javascript:void(0)" @click="$emit(item.name, row)">
+                            {{item.label}}
                         </a>
-                        <span v-if="index !== actions.length - 1"> |&nbsp;</span>
+                        <span v-if="index !== action.items.length - 1"> |&nbsp;</span>
                     </div>
                 </div>
             </td>
