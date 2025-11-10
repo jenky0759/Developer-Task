@@ -69,4 +69,12 @@ th, td {
     display: flex;
     justify-content: center;
 }
+
+tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 8px;
+}
+
+tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 8px;
+}
 </style>

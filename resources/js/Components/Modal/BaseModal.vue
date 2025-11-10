@@ -11,9 +11,7 @@ defineProps({
 <template>
     <VueFinalModal class="modal" content-class="modal-content" :modal-id="modalId">
         <slot name="header" />
-        <div>
-            <slot />
-        </div>
+        <slot />
     </VueFinalModal>
 </template>
 
