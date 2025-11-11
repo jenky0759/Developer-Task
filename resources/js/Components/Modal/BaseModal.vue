@@ -11,7 +11,6 @@ defineProps({
 
 <template>
     <VueFinalModal class="modal" content-class="modal-content" :modal-id="modalId" :click-to-close="false">
-        <slot name="header" />
         <slot />
     </VueFinalModal>
 </template>
@@ -23,10 +22,13 @@ defineProps({
     align-items: center;
 }
 
-.modal-content {
-    background: white;
+.modal .modal-content {
     min-width: 300px;
     min-height: 200px;
     display: flex;
+    flex-direction: column;
+    padding: 20px;
+    margin: 20px;
+    background: #F2F2F2;
 }
 </style>

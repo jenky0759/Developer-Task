@@ -13,8 +13,16 @@ p {
     margin: 0;
 }
 
-body, #app {
-    min-height: 100vh;
+html, body {
+    height: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#app {
+    overflow-x: hidden;
+    min-height: 100%;
 }
 
 h1,
@@ -36,6 +44,12 @@ a {
     background: #FFF;
     padding: 10px 20px;
     border: 1px solid #000;
+}
+
+.form-inputs-container {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
 }
 
 .form-control-group {

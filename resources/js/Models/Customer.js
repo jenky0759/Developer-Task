@@ -9,5 +9,6 @@ export default class Customer extends BaseModel {
         this.category_id = data.category_id;
         this.start_date = data.start_date;
         this.description = data.description;
+        this.contacts = data.contacts;
     }
 }

@@ -9,7 +9,7 @@ import useCustomerService from "@/Composables/useCustomerService.js";
 import ConfirmationModal from "@/Components/Modal/ConfirmationModal.vue";
 
 const action = {
-    header: 'Edit | Delete',
+    header: 'Action',
     items: [
         {
             label: 'Edit',

@@ -6,12 +6,44 @@ import { ref, watch} from "vue";
 import useCustomerService from "@/Composables/useCustomerService.js";
 import Customer from "@/Models/Customer.js";
 import {useVfm} from "vue-final-modal";
+import Table from "@/Components/Table/Table.vue";
+import ContactModal from "@/Components/Modal/ContactModal.vue";
+import ConfirmationModal from "@/Components/Modal/ConfirmationModal.vue";
 
 const props = defineProps({
     customerId: Number
 });
 const emit = defineEmits(['onBackClick', 'onSaveClick']);
 const customerModalId = 'customer-modal';
+
+const action = {
+    header: 'Action',
+    items: [
+        {
+            label: 'Edit',
+            name: 'edit'
+        },
+        {
+            label: 'Delete',
+            name: 'delete',
+        }
+    ]
+};
+
+const columns = [
+    {
+        header: 'First Name',
+        field: 'first_name'
+    },
+    {
+        header: 'Last Name',
+        field: 'last_name'
+    }
+];
+
+const customer = ref(new Customer());
+const validationErrors = ref([]);
+const selectedContact = ref();
 
 const {
     getCustomerById,
@@ -21,9 +53,6 @@ const {
 } = useCustomerService();
 
 const vfm = useVfm();
-
-const customer = ref(new Customer());
-const validationErrors = ref([]);
 
 const onBackClick = () => {
     vfm.close(customerModalId);
@@ -123,15 +152,15 @@ watch(props, async (_oldId, newId) => {
                             </div>
                             <div class="form-control-group">
                                 <label for="name">Name*</label>
-                                <input class="form-input" type="text" required autofocus v-model="customer.name"/>
+                                <input name="name" class="form-input" type="text" required autofocus v-model="customer.name"/>
                             </div>
                             <div class="form-control-group">
                                 <label for="reference">Reference*</label>
-                                <input class="form-input" type="text" required v-model="customer.reference"/>
+                                <input name="reference" class="form-input" type="text" required v-model="customer.reference"/>
                             </div>
                             <div class="form-control-group">
                                 <label for="category">Category*</label>
-                                <select class="form-input" required v-model="customer.category_id">
+                                <select name="category" class="form-input" required v-model="customer.category_id">
                                     <!--Normally would make request to populate-->
                                     <option :selected="customer.category_id === 1" :value="1">Gold</option>
                                     <option :selected="customer.category_id === 2" :value="2">Silver</option>
@@ -147,31 +176,52 @@ watch(props, async (_oldId, newId) => {
                         />
                         <div class="form-inputs-container">
                             <div class="form-control-group">
-                                <label for="startDate">Start Date</label>
-                                <input class="form-input" type="date" v-model="customer.start_date"/>
+                                <label for="start_date">Start Date</label>
+                                <input name="start_date" class="form-input" type="date" v-model="customer.start_date"/>
                             </div>
                             <div class="form-control-group">
                                 <label for="description">Description</label>
-                                <textarea class="form-input" v-model="customer.description"/>
+                                <textarea name="description" class="form-input" v-model="customer.description"/>
                             </div>
                         </div>
                     </div>
                 </form>
+                <div class="section">
+                    <Header
+                        heading="Contacts"
+                        variant="h2">
+                        <Button>
+                            Create
+                        </Button>
+                    </Header>
+                    <Table v-if="customer && customer.contacts && customer.contacts.length"
+                        :rows="customer.contacts"
+                        :columns="columns"
+                        :action="action"
+                        @edit="vfm.open('contact-modal')"
+                    />
+                </div>
             </div>
             <div v-if="isLoading">Loading...</div>
         </div>
+        <ContactModal />
+        <ConfirmationModal
+            modal-id="delete-contact"
+        >
+            <div class="confirmation-modal-slot-wrapper">
+                <Header variant="h3" heading="Delete Contact"/>
+                <div class="question">
+                    <div>Are you sure you wish to delete contact?</div>
+                </div>
+            </div>
+        </ConfirmationModal>
     </BaseModal>
 </template>
 
 <style>
 .customer-modal .modal-content{
     width: 100%;
-    padding: 20px;
-    margin: 20px;
-    background: #F2F2F2;
-    display: flex;
     gap: 20px;
-    flex-direction: column;
 }
 </style>
 
@@ -191,11 +241,5 @@ watch(props, async (_oldId, newId) => {
     display: flex;
     flex-direction: column;
     gap: 15px;
-}
-
-.customer-modal .form-inputs-container {
-    display: flex;
-    gap: 10px;
-    flex-direction: column;
 }
 </style>

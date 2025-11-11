@@ -41,10 +41,8 @@ const onConfirm = () => {
 <style>
 .confirmation-modal .modal-content{
     padding: 20px;
-    background: #F2F2F2;
     display: flex;
     gap: 20px;
-    flex-direction: column;
     justify-content: space-between;
 }
 </style>

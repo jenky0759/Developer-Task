@@ -18,6 +18,7 @@ import Nav from "@/Components/Nav/Nav.vue";
     .page {
         display: flex;
         min-height: 100vh;
+        height: 100%;
     }
 
     .nav-section {
